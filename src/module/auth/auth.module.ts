@@ -17,11 +17,14 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret:
+          configService.get<string>('JWT_ACCESS_SECRET') ??
           configService.get<string>('JWT_SECRET') ??
-          'secure_notes_super_secret_key_12345',
+          'secure_notes_access_secret_key_12345',
         signOptions: {
           expiresIn:
-            (configService.get<string>('JWT_EXPIRES_IN') as any) ?? '7d',
+            (configService.get<string>('JWT_ACCESS_EXPIRES_IN') as any) ??
+            (configService.get<string>('JWT_EXPIRES_IN') as any) ??
+            '1d',
         },
       }),
     }),
