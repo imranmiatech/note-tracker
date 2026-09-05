@@ -10,7 +10,7 @@ const uri =
 async function seed() {
   console.log('🌱 Starting Database Seeding Process...');
   console.log(`Connecting to MongoDB at: ${uri}`);
-  await mongoose.connect(uri);
+  await mongoose.connect(uri, { dbName: 'secure-notes-api' });
 
   const User = mongoose.connection.collection('users');
   const Note = mongoose.connection.collection('notes');
@@ -21,20 +21,20 @@ async function seed() {
   await Note.deleteMany({});
   await Post.deleteMany({});
 
-  const hashedPassword = await bcrypt.hash('admin123', 10);
+  const hashedPassword = await bcrypt.hash('123456', 10);
   const hashedUserPassword = await bcrypt.hash('user123', 10);
 
   // 1. Seed Admin User
   await User.insertOne({
     name: 'System Admin',
-    email: 'admin@example.com',
+    email: 'admin@e.com',
     password: hashedPassword,
     role: 'ADMIN',
     interests: ['security', 'architecture', 'chess'],
     createdAt: new Date(),
     updatedAt: new Date(),
   });
-  console.log('✅ Admin user created: admin@example.com / admin123');
+  console.log('✅ Admin user created: admin@e.com / 123456');
 
   // 2. Seed Regular Users
   const user1Res = await User.insertOne({
