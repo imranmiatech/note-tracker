@@ -110,4 +110,18 @@ export class AuthController {
   async refreshTokens(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authService.refreshTokens(refreshTokenDto);
   }
+
+  @ApiOperation({ summary: 'Logout user and invalidate refresh token' })
+  @ApiResponse({
+    status: 200,
+    description: 'User logged out successfully.',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  async logout(@CurrentUser('sub') userId: string) {
+    return this.authService.logout(userId);
+  }
 }

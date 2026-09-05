@@ -259,4 +259,15 @@ export class AuthService {
       );
     }
   }
+
+  async logout(userId: string) {
+    await this.userModel.updateOne(
+      { _id: userId },
+      { $unset: { refreshToken: 1 } },
+    );
+
+    return {
+      message: 'User logged out successfully',
+    };
+  }
 }
