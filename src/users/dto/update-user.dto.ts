@@ -1,43 +1,44 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
   IsEmail,
   IsEnum,
-  IsNotEmpty,
   IsOptional,
   IsString,
   MinLength,
 } from 'class-validator';
 import { UserRole } from '../../common/enums/user-role.enum.js';
 
-export class CreateUserDto {
-  @ApiProperty({
-    example: 'Admin Created User',
-    description: 'Full name of the user',
+export class UpdateUserDto {
+  @ApiPropertyOptional({
+    example: 'John Doe Updated',
+    description: 'Updated user name',
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty({ message: 'Name is required' })
-  name: string;
+  name?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'user@example.com',
-    description: 'User email address',
+    description: 'Updated user email address',
   })
+  @IsOptional()
   @IsEmail({}, { message: 'Please provide a valid email address' })
-  email: string;
+  email?: string;
 
-  @ApiProperty({
-    example: 'password123',
-    description: 'Password (minimum 6 characters)',
+  @ApiPropertyOptional({
+    example: 'newPassword123',
+    description: 'Optional updated password',
   })
+  @IsOptional()
   @IsString()
   @MinLength(6, { message: 'Password must be at least 6 characters long' })
-  password: string;
+  password?: string;
 
   @ApiPropertyOptional({
     enum: UserRole,
     example: UserRole.USER,
-    description: 'Role for user (USER or ADMIN)',
+    description: 'User role (USER or ADMIN)',
   })
   @IsOptional()
   @IsEnum(UserRole, { message: 'Role must be USER or ADMIN' })

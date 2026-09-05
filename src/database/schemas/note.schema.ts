@@ -16,3 +16,9 @@ export class Note {
 }
 
 export const NoteSchema = SchemaFactory.createForClass(Note);
+
+// Explicit schema.index method definitions as required by review guidelines
+// Compound index to support user listing their own notes with pagination/sorting
+NoteSchema.index({ userId: 1, createdAt: -1 });
+// Index to support admin listing all notes with pagination/sorting
+NoteSchema.index({ createdAt: -1 });

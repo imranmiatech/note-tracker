@@ -1,114 +1,153 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Secure Note-Taking Application API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A production-quality REST API for a **Secure Note-Taking Application** built with **NestJS**, **TypeScript**, **MongoDB**, and **Mongoose**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 1. Core Features & Tech Stack
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Framework**: NestJS & TypeScript
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: JWT Access Token (15m) + Refresh Token (7d)
+- **Password Hashing**: Secure password hashing with `bcrypt` (10 salt rounds)
+- **Role-Based Access Control (RBAC)**: `USER` and `ADMIN` role permissions
+- **Password Reset**: 6-digit numeric OTP sent via Nodemailer email
+- **Aggregation Pipelines**: 
+  - **Scenario 1**: Group users by interests using a single `collection.aggregate()` call (`$unwind` and `$group`).
+  - **Scenario 2**: Retrieve user posts using a single `$lookup` aggregation pipeline.
+- **Validation**: Global `ValidationPipe` with `class-validator` and `class-transformer`.
+- **API Documentation**: Interactive Swagger OpenAPI 3.0 UI.
 
-## Project setup
+---
+
+## 2. Installation & Setup
 
 ```bash
-$ npm install
+# Clone repository & navigate to folder
+cd note-tracker
+
+# Install dependencies
+npm install
+
+# Setup environment variables
+cp .env.example .env
 ```
 
-## Compile and run the project
+---
+
+## 3. Database Seeding & Running
 
 ```bash
-# development
-$ npm run start
+# Seed initial ADMIN and USER accounts
+npm run seed
 
-# watch mode
-$ npm run start:dev
+# Run development server with watch mode
+npm run start:dev
 
-# production mode
-$ npm run start:prod
+# Build production bundle
+npm run build
 ```
 
-## Run tests
+### Initial Seed Accounts
 
-```bash
-# unit tests
-$ npm run test
+| Role | Email | Password |
+|---|---|---|
+| **ADMIN** | `admin@example.com` | `admin123` |
+| **USER** | `user@example.com` | `user123` |
+| **USER** | `jane@example.com` | `user123` |
 
-# e2e tests
-$ npm run test:e2e
+---
 
-# test coverage
-$ npm run test:cov
-```
+## 4. API Endpoints Summary (Global Prefix `/api/v1`)
 
-## Deployment
+### Authentication (`/api/v1/auth`)
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/api/v1/auth/register` | Register new user account (defaults to `USER` role) | Public |
+| `POST` | `/api/v1/auth/login` | Login and receive `accessToken` & `refreshToken` | Public |
+| `GET` | `/api/v1/auth/me` | Fetch authenticated user profile | Authenticated |
+| `POST` | `/api/v1/auth/forgot-password` | Request 6-digit OTP sent via email | Public |
+| `POST` | `/api/v1/auth/reset-password` | Reset password using `{ otp, newPassword }` | Public |
+| `POST` | `/api/v1/auth/refresh` | Issue new tokens using `{ refreshToken }` | Public |
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Users (`/api/v1/users`)
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `GET` | `/api/v1/users/me` | Get own user profile | Authenticated |
+| `PATCH` | `/api/v1/users/me` | Update own profile (`name`, `interests`) | Authenticated |
+| `GET` | `/api/v1/users/analytics/interests` | **Scenario 1 Aggregation**: Group users by interests | Authenticated |
+| `GET` | `/api/v1/users` | Paginated list of all users | **ADMIN Only** |
+| `GET` | `/api/v1/users/:id` | Get specific user profile | **ADMIN Only** |
+| `POST` | `/api/v1/users` | Admin creates user account | **ADMIN Only** |
+| `PATCH` | `/api/v1/users/:id` | Admin updates user account | **ADMIN Only** |
+| `DELETE` | `/api/v1/users/:id` | Admin deletes user account | **ADMIN Only** |
+| `GET` | `/api/v1/users/:userId/notes` | List notes belonging to a specific user | **ADMIN Only** |
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Notes (`/api/v1/notes`)
 
-## Observability
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/api/v1/notes` | Create note (`userId` assigned from `req.user.sub`) | Authenticated |
+| `GET` | `/api/v1/notes` | List notes with pagination (User sees own notes; Admin sees all notes) | Authenticated |
+| `GET` | `/api/v1/notes/:id` | Get specific note (Owner or Admin) | Authenticated |
+| `PATCH` | `/api/v1/notes/:id` | Update specific note (Owner or Admin) | Authenticated |
+| `DELETE` | `/api/v1/notes/:id` | Delete specific note (Owner or Admin) | Authenticated |
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+### Posts (`/api/v1/posts`)
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/api/v1/posts` | Create public post | Authenticated |
+| `GET` | `/api/v1/posts` | List public posts feed with pagination | Public |
+| `GET` | `/api/v1/posts/user/:userId` | **Scenario 2 Aggregation**: Retrieve posts for user with `$lookup` | Public |
+| `GET` | `/api/v1/posts/:id` | Get single post details | Public |
+| `PATCH` | `/api/v1/posts/:id` | Update post (Author or Admin) | Authenticated |
+| `DELETE` | `/api/v1/posts/:id` | Delete post (Author or Admin) | Authenticated |
 
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
+---
 
-## Resources
+## 5. Indexing Strategy
 
-Check out a few resources that may come in handy when working with NestJS:
+> [!IMPORTANT]
+> The indexing strategy follows strict query-matching rules using explicit `schema.index()` method definitions.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observer](https://observer.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+| Collection | Defined Index | Supported Query / Operation | Justification |
+|---|---|---|---|
+| **`users`** | `{ email: 1 }` (`unique`) | `userModel.findOne({ email })` | Login & Register lookups by email; enforces email uniqueness at DB level. |
+| **`users`** | `{ createdAt: -1 }` | `userModel.find().sort({ createdAt: -1 }).skip().limit()` | Supports Admin user listing with pagination sorted by newest first. |
+| **`users`** | `{ interests: 1 }` | `userModel.aggregate([{ $unwind: "$interests" }, ...])` | Multikey index supporting **Scenario 1** interest grouping aggregation. |
+| **`notes`** | `{ userId: 1, createdAt: -1 }` | `noteModel.find({ userId }).sort({ createdAt: -1 }).skip().limit()` | Compound index supporting User note listing filtered by `userId` and sorted by date. |
+| **`posts`** | `{ userId: 1, createdAt: -1 }` | `postModel.aggregate([{ $match: { userId } }, { $lookup: ... }])` | Compound index supporting **Scenario 2** `$lookup` aggregation join and user post queries. |
 
-## Support
+### Why Unnecessary Indexes Were Omitted
+- **No `_id` indexes**: MongoDB automatically indexes `_id` for every collection. Adding `{ _id: 1 }` via `schema.index()` would create a redundant index.
+- **No separate `{ userId: 1 }` index on notes/posts**: The compound index `{ userId: 1, createdAt: -1 }` has `userId` as its prefix, satisfying both single-field `{ userId: 1 }` queries and sorted compound queries.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
+## 6. Aggregation Pipeline Breakdown
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Scenario 1 — Group Users by Interests (`GET /api/v1/users/analytics/interests`)
+- **Constraint**: Implemented using **exactly one `collection.aggregate()` call**.
+- **Pipeline**:
+  1. `$unwind: '$interests'` — Deconstructs the array field `interests` into individual documents.
+  2. `$group: { _id: '$interests', totalUsers: { $sum: 1 }, users: { $push: { _id, name, email, role } } }` — Groups documents by interest value.
+  3. `$sort: { _id: 1 }` — Sorts interest groups alphabetically.
 
-## License
+### Scenario 2 — User Posts with `$lookup` (`GET /api/v1/posts/user/:userId`)
+- **Constraint**: Implemented using a **single aggregation pipeline with `$lookup`**.
+- **Pipeline**:
+  1. `$match: { userId: userObjectId }` — Filters posts by author `userId`.
+  2. `$sort: { createdAt: -1 }` — Sorts posts newest first.
+  3. `$lookup: { from: 'users', localField: 'userId', foreignField: '_id', as: 'author' }` — Joins post author details from the `users` collection.
+  4. `$unwind: '$author'` — Flattens the joined `author` array into an object.
+  5. `$project` — Excludes sensitive password and security token fields.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+---
+
+## 7. Interactive API Documentation (Swagger)
+
+Start the server and visit:
+👉 **[http://localhost:3000/api/v1/docs](http://localhost:3000/api/v1/docs)**

@@ -16,3 +16,9 @@ export class Post {
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);
+
+// Explicit schema.index method definitions as required by review guidelines
+// Compound index supporting $lookup aggregation joining posts by userId and pagination sorting
+PostSchema.index({ userId: 1, createdAt: -1 });
+// Index supporting general post listing pagination
+PostSchema.index({ createdAt: -1 });
