@@ -11,6 +11,9 @@ import { Note, NoteDocument } from '../../database/schemas/note.schema.js';
 import { CreateNoteDto } from './dto/create-note.dto.js';
 import { UpdateNoteDto } from './dto/update-note.dto.js';
 
+import { FilterAdminNotesDto } from './dto/filter-admin-notes.dto.js';
+import { FilterNotesDto } from './dto/filter-notes.dto.js';
+
 @Injectable()
 export class NotesService {
   constructor(
@@ -27,16 +30,56 @@ export class NotesService {
     return newNote;
   }
 
-  async findAll(userPayload: any, paginationQuery: PaginationQueryDto) {
-    const page = Number(paginationQuery.page ?? 1);
-    const limit = Number(paginationQuery.limit ?? 10);
+  async findAll(userPayload: any, query: FilterNotesDto) {
+    const page = Number(query.page ?? 1);
+    const limit = Number(query.limit ?? 10);
     const skip = (page - 1) * limit;
 
-    // Admin can view everyone's notes; Users can view only their own notes
-    const filter =
+    const filter: any =
       userPayload.role === UserRole.ADMIN
         ? {}
         : { userId: new mongoose.Types.ObjectId(userPayload.sub) };
+
+    if (query.title) {
+      filter.title = { $regex: query.title, $options: 'i' };
+    }
+
+    const [notes, total] = await Promise.all([
+      this.noteModel
+        .find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate('userId', 'name email role')
+        .exec(),
+      this.noteModel.countDocuments(filter),
+    ]);
+
+    return {
+      data: notes,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async findAdminNotes(query: FilterAdminNotesDto) {
+    const page = Number(query.page ?? 1);
+    const limit = Number(query.limit ?? 10);
+    const skip = (page - 1) * limit;
+
+    const filter: any = {};
+
+    if (query.userId) {
+      filter.userId = new mongoose.Types.ObjectId(query.userId);
+    }
+
+    if (query.title) {
+      filter.title = { $regex: query.title, $options: 'i' };
+    }
 
     const [notes, total] = await Promise.all([
       this.noteModel

@@ -23,6 +23,7 @@ import { PaginationQueryDto } from '../../common/dto/pagination-query.dto.js';
 import { UserRole } from '../../common/enums/user-role.enum.js';
 import { NotesService } from '../notes/notes.service.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
+import { FilterUsersDto } from './dto/filter-users.dto.js';
 import { UpdateMeDto } from './dto/update-me.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UsersService } from './users.service.js';
@@ -54,17 +55,7 @@ export class UsersController {
     return this.usersService.updateMe(userId, updateMeDto);
   }
 
-  @ApiOperation({
-    summary: 'Get users grouped by interests (Aggregation)',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Array of interests with grouped users.',
-  })
-  @Get('analytics/interests')
-  async getUsersGroupedByInterestsAnalytics() {
-    return this.usersService.getUsersGroupedByInterests();
-  }
+
 
   @ApiOperation({
     summary: 'Get users grouped by interests',
@@ -93,14 +84,14 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: 'List all users with pagination (Admin Only)',
+    summary: 'List all users with filters (name, email, role, page, limit) (Admin Only)',
   })
   @ApiResponse({ status: 200, description: 'Paginated user list.' })
   @ApiResponse({ status: 403, description: 'Forbidden (Admin role required).' })
   @Roles(UserRole.ADMIN)
   @Get()
-  async findAll(@Query() paginationQuery: PaginationQueryDto) {
-    return this.usersService.findAll(paginationQuery);
+  async findAll(@Query() query: FilterUsersDto) {
+    return this.usersService.findAll(query);
   }
 
   @ApiOperation({ summary: 'Get user details by ID (Admin Only)' })

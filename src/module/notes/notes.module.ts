@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module.js';
 import { Note, NoteSchema } from '../../database/schemas/note.schema.js';
 import { UsersModule } from '../users/users.module.js';
+import { AdminNotesController } from './admin-notes.controller.js';
 import { NotesController } from './notes.controller.js';
 import { NotesService } from './notes.service.js';
 
@@ -12,7 +13,7 @@ import { NotesService } from './notes.service.js';
     AuthModule,
     forwardRef(() => UsersModule),
   ],
-  controllers: [NotesController],
+  controllers: [NotesController, AdminNotesController],
   providers: [NotesService],
   exports: [NotesService],
 })

@@ -11,21 +11,38 @@ import { User, UserDocument } from '../../database/schemas/user.schema.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateMeDto } from './dto/update-me.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
+import { FilterUsersDto } from './dto/filter-users.dto.js';
+
+export type UserQuery = FilterUsersDto & PaginationQueryDto;
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-  ) { }
+  ) {}
 
-  async findAll(paginationQuery: PaginationQueryDto) {
-    const page = Number(paginationQuery.page ?? 1);
-    const limit = Number(paginationQuery.limit ?? 10);
+  async findAll(query: FilterUsersDto) {
+    const page = Number(query.page ?? 1);
+    const limit = Number(query.limit ?? 10);
     const skip = (page - 1) * limit;
+
+    const filter: any = {};
+
+    if (query.name) {
+      filter.name = { $regex: query.name, $options: 'i' };
+    }
+
+    if (query.email) {
+      filter.email = { $regex: query.email, $options: 'i' };
+    }
+
+    if (query.role) {
+      filter.role = query.role;
+    }
 
     const [users, total] = await Promise.all([
       this.userModel
-        .find()
+        .find(filter)
         .select(
           '-password -refreshToken -resetPasswordOtp -resetPasswordOtpExpires',
         )
@@ -33,7 +50,7 @@ export class UsersService {
         .skip(skip)
         .limit(limit)
         .exec(),
-      this.userModel.countDocuments(),
+      this.userModel.countDocuments(filter),
     ]);
 
     return {

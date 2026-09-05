@@ -20,8 +20,11 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
 import { PaginationQueryDto } from '../../common/dto/pagination-query.dto.js';
 import { CreateNoteDto } from './dto/create-note.dto.js';
+import { FilterNotesDto } from './dto/filter-notes.dto.js';
 import { UpdateNoteDto } from './dto/update-note.dto.js';
 import { NotesService } from './notes.service.js';
+
+export type NoteQuery = FilterNotesDto & PaginationQueryDto;
 
 @ApiTags('Notes')
 @ApiBearerAuth('JWT-auth')
@@ -42,15 +45,15 @@ export class NotesController {
 
   @ApiOperation({
     summary:
-      'List notes with pagination (User sees own notes; Admin sees all notes)',
+      'List notes with filters (title, page, limit)',
   })
   @ApiResponse({ status: 200, description: 'Paginated notes list.' })
   @Get()
   async findAll(
     @CurrentUser() userPayload: any,
-    @Query() paginationQuery: PaginationQueryDto,
+    @Query() query: FilterNotesDto,
   ) {
-    return this.notesService.findAll(userPayload, paginationQuery);
+    return this.notesService.findAll(userPayload, query);
   }
 
   @ApiOperation({ summary: 'Get note by ID' })
