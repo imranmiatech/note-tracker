@@ -180,7 +180,6 @@ export class AuthService {
 
     return {
       message: '6-digit OTP code sent successfully to your email address.',
-      otp,
     };
   }
 
