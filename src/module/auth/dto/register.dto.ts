@@ -35,7 +35,7 @@ export class RegisterDto {
   @ApiPropertyOptional({
     type: [String],
     example: ['reading', 'chess'],
-    description: 'Array of user interests for Scenario 1 aggregation',
+    description: 'Array of user interests',
   })
   @IsOptional()
   @IsArray()

@@ -15,10 +15,10 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
-import { RolesGuard } from '../auth/guards/roles.guard.js';
-import { PaginationQueryDto } from '../common/dto/pagination-query.dto.js';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { PaginationQueryDto } from '../../common/dto/pagination-query.dto.js';
 import { CreateNoteDto } from './dto/create-note.dto.js';
 import { UpdateNoteDto } from './dto/update-note.dto.js';
 import { NotesService } from './notes.service.js';
@@ -28,7 +28,7 @@ import { NotesService } from './notes.service.js';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('notes')
 export class NotesController {
-  constructor(private readonly notesService: NotesService) {}
+  constructor(private readonly notesService: NotesService) { }
 
   @ApiOperation({ summary: 'Create a new note' })
   @ApiResponse({ status: 201, description: 'Note created successfully.' })

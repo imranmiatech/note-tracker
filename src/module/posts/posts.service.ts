@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { PaginationQueryDto } from '../common/dto/pagination-query.dto.js';
-import { Post, PostDocument } from '../database/schemas/post.schema.js';
-import { UserRole } from '../common/enums/user-role.enum.js';
+import { PaginationQueryDto } from '../../common/dto/pagination-query.dto.js';
+import { Post, PostDocument } from '../../database/schemas/post.schema.js';
+import { UserRole } from '../../common/enums/user-role.enum.js';
 import { CreatePostDto } from './dto/create-post.dto.js';
 import { UpdatePostDto } from './dto/update-post.dto.js';
 
@@ -15,7 +15,7 @@ import { UpdatePostDto } from './dto/update-post.dto.js';
 export class PostsService {
   constructor(
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
-  ) {}
+  ) { }
 
   async create(createPostDto: CreatePostDto, userId: string) {
     const newPost = await this.postModel.create({
@@ -54,8 +54,7 @@ export class PostsService {
     };
   }
 
-  // Scenario 2: User Posts ($lookup)
-  // Constraint: Single aggregation pipeline with a $lookup stage
+  // Fetch posts with author details using $lookup aggregation
   async getUserPostsWithLookup(userId: string) {
     const userObjectId = new mongoose.Types.ObjectId(userId);
 

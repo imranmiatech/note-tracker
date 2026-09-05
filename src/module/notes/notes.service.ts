@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { UserRole } from '../common/enums/user-role.enum.js';
-import { PaginationQueryDto } from '../common/dto/pagination-query.dto.js';
-import { Note, NoteDocument } from '../database/schemas/note.schema.js';
+import { UserRole } from '../../common/enums/user-role.enum.js';
+import { PaginationQueryDto } from '../../common/dto/pagination-query.dto.js';
+import { Note, NoteDocument } from '../../database/schemas/note.schema.js';
 import { CreateNoteDto } from './dto/create-note.dto.js';
 import { UpdateNoteDto } from './dto/update-note.dto.js';
 

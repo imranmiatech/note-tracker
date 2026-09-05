@@ -33,7 +33,28 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-// Explicit schema.index method definitions as required by review guidelines
+// Indexes
 UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ createdAt: -1 });
 UserSchema.index({ interests: 1 });
+
+// Exclude sensitive fields from responses
+UserSchema.set('toJSON', {
+  transform: (_, ret: Record<string, any>) => {
+    delete ret.password;
+    delete ret.refreshToken;
+    delete ret.resetPasswordOtp;
+    delete ret.resetPasswordOtpExpires;
+    return ret;
+  },
+});
+
+UserSchema.set('toObject', {
+  transform: (_, ret: Record<string, any>) => {
+    delete ret.password;
+    delete ret.refreshToken;
+    delete ret.resetPasswordOtp;
+    delete ret.resetPasswordOtpExpires;
+    return ret;
+  },
+});

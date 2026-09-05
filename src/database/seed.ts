@@ -25,7 +25,7 @@ async function seed() {
   const hashedUserPassword = await bcrypt.hash('user123', 10);
 
   // 1. Seed Admin User
-  const adminRes = await User.insertOne({
+  await User.insertOne({
     name: 'System Admin',
     email: 'admin@example.com',
     password: hashedPassword,

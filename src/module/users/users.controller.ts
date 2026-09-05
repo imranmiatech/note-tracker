@@ -15,12 +15,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
-import { Roles } from '../auth/decorators/roles.decorator.js';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
-import { RolesGuard } from '../auth/guards/roles.guard.js';
-import { PaginationQueryDto } from '../common/dto/pagination-query.dto.js';
-import { UserRole } from '../common/enums/user-role.enum.js';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import { Roles } from '../../common/decorators/roles.decorator.js';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { PaginationQueryDto } from '../../common/dto/pagination-query.dto.js';
+import { UserRole } from '../../common/enums/user-role.enum.js';
 import { NotesService } from '../notes/notes.service.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateMeDto } from './dto/update-me.dto.js';
@@ -35,7 +35,7 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly notesService: NotesService,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: 'Get authenticated user profile' })
   @ApiResponse({ status: 200, description: 'Own user profile.' })
@@ -55,8 +55,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary:
-      'Scenario 1 Aggregation: Group users by interests using single aggregate() call',
+    summary: 'Get users grouped by interests (Aggregation)',
   })
   @ApiResponse({
     status: 200,
@@ -68,8 +67,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary:
-      'Scenario 1 Aggregation Alias: Group users by interests using single aggregate() call',
+    summary: 'Get users grouped by interests',
   })
   @ApiResponse({
     status: 200,

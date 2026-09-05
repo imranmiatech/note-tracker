@@ -15,10 +15,10 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
-import { RolesGuard } from '../auth/guards/roles.guard.js';
-import { PaginationQueryDto } from '../common/dto/pagination-query.dto.js';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { PaginationQueryDto } from '../../common/dto/pagination-query.dto.js';
 import { CreatePostDto } from './dto/create-post.dto.js';
 import { UpdatePostDto } from './dto/update-post.dto.js';
 import { PostsService } from './posts.service.js';
@@ -26,7 +26,7 @@ import { PostsService } from './posts.service.js';
 @ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(private readonly postsService: PostsService) { }
 
   @ApiOperation({ summary: 'Create a new post' })
   @ApiResponse({ status: 201, description: 'Post created successfully.' })
@@ -48,8 +48,7 @@ export class PostsController {
   }
 
   @ApiOperation({
-    summary:
-      'Scenario 2 Aggregation: Retrieve all posts for a user using single $lookup aggregation pipeline',
+    summary: 'Retrieve user posts joined with author details ($lookup aggregation)',
   })
   @ApiResponse({
     status: 200,

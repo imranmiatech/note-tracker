@@ -3,15 +3,21 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
-import { AuthModule } from './auth/auth.module.js';
+import { AuthModule } from './module/auth/auth.module.js';
 import { DatabaseModule } from './database/database.module.js';
-import { NotesModule } from './notes/notes.module.js';
-import { PostsModule } from './posts/posts.module.js';
-import { UsersModule } from './users/users.module.js';
+import { NotesModule } from './module/notes/notes.module.js';
+import { PostsModule } from './module/posts/posts.module.js';
+import { UsersModule } from './module/users/users.module.js';
+
+import { configuration, validate } from './config/index.js';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+      validate,
+    }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -50,4 +56,4 @@ import { UsersModule } from './users/users.module.js';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

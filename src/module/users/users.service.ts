@@ -6,8 +6,8 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
-import { PaginationQueryDto } from '../common/dto/pagination-query.dto.js';
-import { User, UserDocument } from '../database/schemas/user.schema.js';
+import { PaginationQueryDto } from '../../common/dto/pagination-query.dto.js';
+import { User, UserDocument } from '../../database/schemas/user.schema.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateMeDto } from './dto/update-me.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
@@ -16,7 +16,7 @@ import { UpdateUserDto } from './dto/update-user.dto.js';
 export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-  ) {}
+  ) { }
 
   async findAll(paginationQuery: PaginationQueryDto) {
     const page = Number(paginationQuery.page ?? 1);
@@ -47,8 +47,7 @@ export class UsersService {
     };
   }
 
-  // Scenario 1: Group by Interests
-  // Constraint: Uses EXACTLY ONE collection.aggregate() call
+  // Aggregate users grouped by interest
   async getUsersGroupedByInterests() {
     return this.userModel.aggregate([
       { $unwind: '$interests' },
@@ -99,14 +98,7 @@ export class UsersService {
       user.interests = updateMeDto.interests;
     }
 
-    await user.save();
-
-    const result = user.toObject();
-    delete (result as any).password;
-    delete (result as any).refreshToken;
-    delete (result as any).resetPasswordOtp;
-    delete (result as any).resetPasswordOtpExpires;
-    return result;
+    return user.save();
   }
 
   async create(createUserDto: CreateUserDto) {
@@ -120,17 +112,13 @@ export class UsersService {
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    const newUser = await this.userModel.create({
+    return this.userModel.create({
       name: createUserDto.name,
       email: createUserDto.email.toLowerCase(),
       password: hashedPassword,
       role: createUserDto.role,
       interests: createUserDto.interests ?? [],
     });
-
-    const result = newUser.toObject();
-    delete (result as any).password;
-    return result;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -168,14 +156,7 @@ export class UsersService {
       user.interests = updateUserDto.interests;
     }
 
-    await user.save();
-
-    const result = user.toObject();
-    delete (result as any).password;
-    delete (result as any).refreshToken;
-    delete (result as any).resetPasswordOtp;
-    delete (result as any).resetPasswordOtpExpires;
-    return result;
+    return user.save();
   }
 
   async remove(id: string) {

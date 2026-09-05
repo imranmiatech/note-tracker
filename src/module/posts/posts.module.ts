@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module.js';
-import { Post, PostSchema } from '../database/schemas/post.schema.js';
+import { Post, PostSchema } from '../../database/schemas/post.schema.js';
 import { PostsController } from './posts.controller.js';
 import { PostsService } from './posts.service.js';
 
@@ -14,4 +14,4 @@ import { PostsService } from './posts.service.js';
   providers: [PostsService],
   exports: [PostsService],
 })
-export class PostsModule {}
+export class PostsModule { }

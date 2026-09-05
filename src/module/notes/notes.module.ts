@@ -1,7 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module.js';
-import { Note, NoteSchema } from '../database/schemas/note.schema.js';
+import { Note, NoteSchema } from '../../database/schemas/note.schema.js';
 import { UsersModule } from '../users/users.module.js';
 import { NotesController } from './notes.controller.js';
 import { NotesService } from './notes.service.js';
@@ -16,4 +16,4 @@ import { NotesService } from './notes.service.js';
   providers: [NotesService],
   exports: [NotesService],
 })
-export class NotesModule {}
+export class NotesModule { }

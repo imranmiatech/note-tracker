@@ -10,9 +10,9 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
-import { UserRole } from '../common/enums/user-role.enum.js';
-import { User, UserDocument } from '../database/schemas/user.schema.js';
-import { MailService } from '../mail/mail.service.js';
+import { UserRole } from '../../common/enums/user-role.enum.js';
+import { User, UserDocument } from '../../database/schemas/user.schema.js';
+import { MailService } from '../../mail/mail.service.js';
 import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RefreshTokenDto } from './dto/refresh-token.dto.js';
@@ -26,7 +26,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   private async generateTokens(userId: string, email: string, role: string) {
     const payload = { sub: userId, email, role };
