@@ -9,6 +9,32 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Enable CORS
+  const corsOrigin = process.env.CORS_ORIGIN;
+  let allowedOrigins: boolean | string | string[] = true;
+
+  if (corsOrigin) {
+    if (corsOrigin === '*') {
+      allowedOrigins = '*';
+    } else if (corsOrigin.includes(',')) {
+      allowedOrigins = corsOrigin.split(',').map((origin) => origin.trim());
+    } else {
+      allowedOrigins = corsOrigin.trim();
+    }
+  }
+
+  app.enableCors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Accept',
+      'X-Requested-With',
+    ],
+  });
+
   // Set global API prefix to /api/v1
   app.setGlobalPrefix('api/v1');
 

@@ -18,6 +18,10 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsOptional()
+  CORS_ORIGIN?: string;
+
+  @IsString()
+  @IsOptional()
   DATABASE: string = 'mongodb://127.0.0.1:27017/secure-notes-api';
 
   @IsString()
