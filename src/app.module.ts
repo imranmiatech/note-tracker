@@ -28,13 +28,13 @@ import { UsersModule } from './users/users.module.js';
           dbName: 'secure-notes-api',
           connectionFactory: (connection) => {
             connection.on('connected', () => {
-              console.log('✅ MongoDB connected successfully');
+              console.log('MongoDB connected successfully');
             });
             connection.on('error', (error: any) => {
-              console.error('❌ MongoDB connection error:', error.message);
+              console.error(' MongoDB connection error:', error.message);
             });
             connection.on('disconnected', () => {
-              console.log('⚠️ MongoDB disconnected');
+              console.log('MongoDB disconnected');
             });
             return connection;
           },
